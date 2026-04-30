@@ -9,23 +9,23 @@ function out = run_mlc_opf_hour(mpc_base, branch_availability, gen_availability,
         voll = 10000;
     end
 
-    % ---------------------------------
+   
     % 0) Start from base case
-    % ---------------------------------
+   
     mpc = mpc_base;
 
-    % ---------------------------------
+ 
     % 1) Apply branch outages
-    % ---------------------------------
+   
     if length(branch_availability) ~= size(mpc.branch, 1)
         error('branch_availability length must match number of branches.');
     end
 
     mpc.branch(:, BR_STATUS) = double(branch_availability(:));
 
-    % ---------------------------------
+   
     % 1b) Apply generator outages
-    % ---------------------------------
+   
     nGenOrigPhysical = size(mpc_base.gen, 1);
 
     if length(gen_availability) ~= nGenOrigPhysical
@@ -49,9 +49,9 @@ function out = run_mlc_opf_hour(mpc_base, branch_availability, gen_availability,
     Pd_original = mpc.bus(:, PD);
     Qd_original = mpc.bus(:, QD);
 
-    % ---------------------------------
+   
     % 2) Find islands
-    % ---------------------------------
+    
     [groups, ~] = find_islands(mpc);
 
     if isempty(groups)
@@ -65,9 +65,9 @@ function out = run_mlc_opf_hour(mpc_base, branch_availability, gen_availability,
         return;
     end
 
-    % ---------------------------------
+   
     % 3) Find the original reference bus
-    % ---------------------------------
+   
     ref_row = find(mpc_base.bus(:, BUS_TYPE) == REF, 1);
 
     if isempty(ref_row)
@@ -97,9 +97,9 @@ function out = run_mlc_opf_hour(mpc_base, branch_availability, gen_availability,
 
     main_group_buses = groups{main_group_idx};
 
-    % ---------------------------------
+   
     % 4) Fully curtail load outside main island
-    % ---------------------------------
+    
     all_bus_numbers = mpc.bus(:, BUS_I);
     is_in_main = ismember(all_bus_numbers, main_group_buses);
 
@@ -124,9 +124,9 @@ function out = run_mlc_opf_hour(mpc_base, branch_availability, gen_availability,
         mpc.bus(r, BUS_TYPE) = NONE;
     end
 
-    % ---------------------------------
+   
     % 5) Turn off generators outside main island
-    % ---------------------------------
+    
     gen_bus_numbers = mpc.gen(:, GEN_BUS);
     gen_outside = ~ismember(gen_bus_numbers, main_group_buses);
 
@@ -143,9 +143,9 @@ function out = run_mlc_opf_hour(mpc_base, branch_availability, gen_availability,
 
     mpc.branch(~branch_keep, BR_STATUS) = 0;
 
-    % ---------------------------------
+   
     % 7) Find remaining connected load buses
-    % ---------------------------------
+   
     Pd = mpc.bus(:, PD);
     Qd = mpc.bus(:, QD);
 
@@ -163,9 +163,9 @@ function out = run_mlc_opf_hour(mpc_base, branch_availability, gen_availability,
         return;
     end
 
-    % ---------------------------------
+   
     % 8) Build fictitious generators
-    % ---------------------------------
+   
     fake_gen = zeros(nLoad, size(mpc.gen, 2));
 
     for k = 1:nLoad
@@ -189,9 +189,9 @@ function out = run_mlc_opf_hour(mpc_base, branch_availability, gen_availability,
     nGenOrig = size(mpc.gen, 1);
     mpc.gen = [mpc.gen; fake_gen];
 
-    % ---------------------------------
+   
     % 9) Build matching gencost rows
-    % ---------------------------------
+    
     fake_gencost = zeros(nLoad, size(mpc.gencost, 2));
 
     for k = 1:nLoad
@@ -205,15 +205,15 @@ function out = run_mlc_opf_hour(mpc_base, branch_availability, gen_availability,
 
     mpc.gencost = [mpc.gencost; fake_gencost];
 
-    % ---------------------------------
+    
     % 10) Run AC OPF
-    % ---------------------------------
+   
     mpopt = mpoption('verbose', 0, 'out.all', 0);
     results = runopf(mpc, mpopt);
 
-    % ---------------------------------
+   
     % 11) Extract curtailment
-    % ---------------------------------
+    
     if results.success
         fake_pg = results.gen(nGenOrig+1:end, PG);
         connected_curtail = sum(fake_pg);
