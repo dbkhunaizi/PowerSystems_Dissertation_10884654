@@ -46,7 +46,6 @@ The code is organised into separate modelling layers:
 | `run_baseline.m` | Script that calls `build_baseline_availability_8760.m`, generates the no-storm baseline availability matrices using a fixed random seed, and saves the output as `build_baseline_8760.mat`. |
 | `run_mlc_opf_hour.m` | Main hourly island-aware MLC-OPF function. It applies branch and generator outages, checks for disconnected islands, counts disconnected load as curtailed demand, adds fictitious load-curtailment generators, and runs AC OPF. |
 | `run_baseline_8760_with_mlc.m` | Final baseline yearly assessment script. It runs the 8760-hour no-storm baseline case by calling `run_mlc_opf_hour.m` for each hour and saves `baseline_mlc_results_8760.mat`. |
-`run_baseline_8760_with_mlc.m` and `run_mlc_opf_hour.m`. |
 | `smcs_row.m` | Generates one chronological up/down availability sequence for a component. |
 | `set_regions_ieee24.m` | Assigns IEEE 24-bus system buses and branches into simplified regions. |
 | `build_single_storm.m` | Generates stochastic windstorm events for each severity level and combines baseline and storm-induced branch outages into `A_total_branch`. |
