@@ -3,9 +3,9 @@ clear; clc; close all;
 severity = 'medium';
 load(sprintf('summary_%s_allruns.mat', severity));
 
-% -----------------------------
+
 % Histograms
-% -----------------------------
+
 figure;
 histogram(EENS_all, 'Normalization', 'probability');
 xlabel('EENS (MWh)');
@@ -20,9 +20,9 @@ ylabel('Proportion of Runs');
 title(sprintf('%s Severity: Distribution of LOLP', upper(severity)));
 grid on;
 
-% -----------------------------
+
 % Scatter plots of all runs
-% -----------------------------
+
 figure;
 plot(1:length(EENS_all), sort(EENS_all), 'o-', 'LineWidth', 1.2);
 xlabel('Ordered Run Index');
@@ -37,9 +37,9 @@ ylabel('LOLP');
 title(sprintf('%s Severity: Ordered LOLP Values', upper(severity)));
 grid on;
 
-% -----------------------------
+
 % Summary statistics
-% -----------------------------
+
 EENS_sorted = sort(EENS_all);
 LOLP_sorted = sort(LOLP_all);
 
