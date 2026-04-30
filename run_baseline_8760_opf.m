@@ -26,16 +26,15 @@ if T ~= 8760
     warning('Expected T = 8760, but got T = %d.', T);
 end
 
-% =========================================================
+
 % MLC / VOLL SETTINGS
-% =========================================================
+
 voll = 10000;      % very high curtailment cost
 curtail_tol = 1e-3; % MW threshold to ignore numerical noise
 
-% =========================================================
 % ADD LOAD CURTAILMENT GENERATORS ONCE TO BASE CASE
 % Each load bus gets one fictitious generator
-% =========================================================
+
 mpc_mlc = add_mlc_generators(mpc_base, voll);
 
 nGenOrig = ng;
@@ -46,14 +45,12 @@ fprintf('Original generators       : %d\n', nGenOrig);
 fprintf('Curtailment generators    : %d\n', nCurtGen);
 fprintf('Total generators in OPF   : %d\n', nGenTot);
 
-% =========================================================
-% MATPOWER OPTIONS
-% =========================================================
+
 mpopt = mpoption('verbose', 0, 'out.all', 0);
 
-% =========================================================
+
 % PREALLOCATE OUTPUTS
-% =========================================================
+
 success_hourly          = false(T,1);
 unresolved_flag         = false(T,1);
 total_curtail_hourly    = zeros(T,1);
@@ -63,9 +60,9 @@ opf_obj_hourly          = NaN(T,1);
 n_branch_out_hourly     = zeros(T,1);
 n_gen_out_hourly        = zeros(T,1);
 
-% =========================================================
+
 % HOURLY BASELINE OPF LOOP
-% =========================================================
+
 for h = 1:T
     if mod(h,500) == 0 || h == 1 || h == T
         fprintf('Running baseline OPF hour %d of %d...\n', h, T);
@@ -73,9 +70,9 @@ for h = 1:T
 
     mpc_h = mpc_mlc;
 
-    % -----------------------------------------------------
+  
     % Apply branch availability for this hour
-    % -----------------------------------------------------
+    
     branch_up = logical(A_branch(:,h));
     mpc_h.branch(:, BR_STATUS) = branch_up;
 
@@ -105,9 +102,9 @@ for h = 1:T
     n_branch_out_hourly(h) = sum(~branch_up);
     n_gen_out_hourly(h)    = sum(~gen_up);
 
-    % -----------------------------------------------------
+    
     % Run AC OPF
-    % -----------------------------------------------------
+    
     try
         warning('off','all');
         results = runopf(mpc_h, mpopt);
@@ -200,9 +197,9 @@ fprintf('Mean curtailment if disrupted   = %.4f\n', mean_curtail_ifany);
 fprintf('\nBaseline failed hours:\n');
 disp(failed_hours_baseline(:)');
 
-% =========================================================
+
 % SAVE RESULTS
-% =========================================================
+
 save('baseline_opf_results_8760.mat', ...
     'success_hourly', 'unresolved_flag', 'total_curtail_hourly', ...
     'disconnected_demand_MW', 'curtailment_by_bus', ...
@@ -231,9 +228,9 @@ ylabel('OPF success (1=yes, 0=no)');
 title('Baseline OPF success by hour');
 grid on;
 
-% =========================================================
+
 % LOCAL FUNCTIONS
-% =========================================================
+
 function mpc_out = add_mlc_generators(mpc_in, voll)
     define_constants;
 
